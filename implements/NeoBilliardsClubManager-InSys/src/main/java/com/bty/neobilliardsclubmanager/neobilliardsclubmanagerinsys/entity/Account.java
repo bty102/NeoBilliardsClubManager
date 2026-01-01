@@ -38,7 +38,7 @@ public class Account {
     @Column(name = "CreatedAt", nullable = false)
     LocalDateTime createdAt;
 
-    @OneToOne(mappedBy = "account")
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
     EmployeeProfile employeeProfile;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
