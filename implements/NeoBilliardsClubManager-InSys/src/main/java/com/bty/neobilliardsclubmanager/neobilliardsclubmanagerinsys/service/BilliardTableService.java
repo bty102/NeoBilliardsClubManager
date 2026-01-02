@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,6 +23,7 @@ public class BilliardTableService {
     // Tham so:
     //      - pageNumber >= 1
     //      - pageSize >= 1
+    @PreAuthorize("hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name()) or #isLocked == false")
     public Page<BilliardTableResponse> getBilliardTablesByIsLocked(boolean isLocked, int pageNumber, int pageSize) {
 
         if(pageNumber < 1) pageNumber = 1;
