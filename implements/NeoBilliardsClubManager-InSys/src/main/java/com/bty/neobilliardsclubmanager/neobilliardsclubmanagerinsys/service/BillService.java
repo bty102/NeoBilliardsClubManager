@@ -5,6 +5,7 @@ import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.Accou
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.Bill;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.BilliardTable;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillCreationException;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillUpdateException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.AccountRepository;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.BillRepository;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.BilliardTableRepository;
@@ -50,6 +51,17 @@ public class BillService {
                 .member(null)
                 .paid(false)
                 .build();
+        billRepository.save(bill);
+    }
+
+    public void updateCheckOutTime(Long billId, LocalDateTime checkOutTime) {
+        Bill bill = billRepository.findById(billId)
+                .orElseThrow(() -> {throw new BillUpdateException("Cập nhật thất bại");
+                });
+        if(bill.getCheckOutTime() != null) {
+            throw new BillUpdateException("Cập nhật thất bại");
+        }
+        bill.setCheckOutTime(checkOutTime);
         billRepository.save(bill);
     }
 }
