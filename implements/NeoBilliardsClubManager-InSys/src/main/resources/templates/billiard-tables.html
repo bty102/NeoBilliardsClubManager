@@ -21,6 +21,8 @@
                         <p th:text="'Số bàn: ' + *{tableNumber}"></p>
                         <p th:text="*{billiardTableType.name}"></p>
                         <p th:if="*{isLocked}"><i class="bi bi-lock-fill"></i></p>
+                        <a th:if="*{!isOpening}" href="">Mở bàn</a>
+                        <a th:if="*{isOpening}" href="">Đóng bàn</a>
                     </div>
                     <p th:if="${billiardTableResponses.isEmpty()}" th:text="'Không có bàn nào'"></p>
                 </div>

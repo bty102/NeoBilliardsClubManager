@@ -31,6 +31,9 @@ public class BilliardTable {
     @Column(name = "IsLocked", nullable = false)
     Boolean isLocked;
 
+    @Column(name = "IsOpening", nullable = false)
+    Boolean isOpening;
+
     @ManyToOne
     @JoinColumn(name = "BilliardTableTypeId", nullable = false)
     BilliardTableType billiardTableType;

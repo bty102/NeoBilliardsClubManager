@@ -20,5 +20,7 @@ public class BilliardTableResponse {
 
     Boolean isLocked;
 
+    Boolean isOpening;
+
     BilliardTableTypeResponse billiardTableType;
 }

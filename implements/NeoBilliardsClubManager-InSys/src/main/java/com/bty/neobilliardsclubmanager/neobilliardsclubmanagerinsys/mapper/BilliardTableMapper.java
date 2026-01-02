@@ -20,6 +20,7 @@ public class BilliardTableMapper {
                 .tableNumber(billiardTable.getTableNumber())
                 .imagePath(billiardTable.getImagePath())
                 .isLocked(billiardTable.getIsLocked())
+                .isOpening(billiardTable.getIsOpening())
                 .billiardTableType(billiardTableTypeMapper.toBilliardTableTypeResponse(billiardTable.getBilliardTableType()))
                 .build();
     }
