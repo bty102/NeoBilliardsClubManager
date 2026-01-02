@@ -35,6 +35,9 @@ public class Bill {
     @Column(name = "CreatedAt", nullable = false)
     LocalDateTime createdAt;
 
+    @Column(name = "Paid", nullable = false)
+    Boolean paid;
+
     @ManyToOne
     @JoinColumn(name = "BilliardTableId")
     BilliardTable billiardTable;

@@ -4,6 +4,7 @@ import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.request.
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.response.BilliardTableResponse;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.BilliardTable;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillCreationException;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BilliardTableClosingException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BilliardTableOpeningException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.mapper.BilliardTableMapper;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.BilliardTableRepository;
@@ -63,6 +64,18 @@ public class BilliardTableService {
         billService.createBill(billCreationRequest);
         billiardTable.setIsOpening(true);
         billiardTableRepository.save(billiardTable);
+    }
+
+    public void closeBilliardTable(Long tableNumber) {
+        BilliardTable billiardTable = billiardTableRepository.findByTableNumber(tableNumber)
+                .orElseThrow(() -> {throw new BilliardTableClosingException("Đóng bàn thất bại");
+                });
+        if(billiardTable.getIsLocked()) {
+            throw new BilliardTableClosingException("Đóng bàn thất bại");
+        }
+        if(!billiardTable.getIsOpening()) {
+            throw new BilliardTableClosingException("Đóng bàn thất bại");
+        }
     }
 
 }

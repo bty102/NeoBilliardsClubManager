@@ -1563,6 +1563,22 @@
 											"top": 357,
 											"width": 267.50146484375,
 											"height": 13
+										},
+										{
+											"_type": "ERDColumnView",
+											"_id": "AAAAAAGbgAMjDbKQhI0=",
+											"_parent": {
+												"$ref": "AAAAAAGbZJTv43HGB7M="
+											},
+											"model": {
+												"$ref": "AAAAAAGbgAMjALKNwJE="
+											},
+											"font": "Arial;13;0",
+											"parentStyle": true,
+											"left": 525,
+											"top": 372,
+											"width": 267.50146484375,
+											"height": 13
 										}
 									],
 									"font": "Arial;13;0",
@@ -1570,7 +1586,7 @@
 									"left": 520,
 									"top": 247,
 									"width": 277.50146484375,
-									"height": 128
+									"height": 143
 								}
 							],
 							"font": "Arial;13;0",
@@ -3088,6 +3104,17 @@
 							"length": 0,
 							"foreignKey": true,
 							"nullable": true
+						},
+						{
+							"_type": "ERDColumn",
+							"_id": "AAAAAAGbgAMjALKNwJE=",
+							"_parent": {
+								"$ref": "AAAAAAGbZJTv43HCHFo="
+							},
+							"name": "Paid",
+							"documentation": "- Đã thanh toán hay chưa",
+							"type": "BIT",
+							"length": 0
 						}
 					]
 				},

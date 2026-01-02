@@ -51,4 +51,10 @@ public class BilliardTableController {
         redirectAttributes.addFlashAttribute("successfulTableOpeningMsg", "Mở bàn thành công");
         return "redirect:/billiardTables";
     }
+
+    @GetMapping("/billiardTables/close")
+    public String closeBilliardTable(@RequestParam(name = "tableNumber", required = true) Long tableNumber) {
+
+        return "";
+    }
 }

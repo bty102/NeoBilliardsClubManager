@@ -48,6 +48,7 @@ public class BillService {
                 .billiardTable(billiardTable)
                 .account(account)
                 .member(null)
+                .paid(false)
                 .build();
         billRepository.save(bill);
     }
