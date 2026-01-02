@@ -1,30 +1,73 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Danh sách bàn Bi-a</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
+    <script th:if="${successfulTableOpeningMsg}" th:inline="javascript">
+        Swal.fire({
+            text: [[${successfulTableOpeningMsg}]],
+            toast: true,
+            showConfirmButton: false,
+            showCloseButton: true,
+            position: 'top-end',
+            icon: 'success',
+            timer: 3000
+        });
+    </script>
+    <script th:if="${unsuccessfulTableOpeningMsg}" th:inline="javascript">
+        Swal.fire({
+            text: [[${unsuccessfulTableOpeningMsg}]],
+            toast: true,
+            showConfirmButton: false,
+            showCloseButton: true,
+            position: 'top-end',
+            icon: 'error',
+            timer: 3000
+        });
+    </script>
+    <div th:replace="fragments::header">
+
+    </div>
     <div class="container-fluid">
         <div class="row">
             <div class="col-3">
+                <div th:replace="fragments::sidebar">
 
+                </div>
             </div>
             <div class="col-9">
+                <div class="row mb-3">
+                    <div class="col-auto">
+                        <a sec:authorize="hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())" th:href="@{'/billiardTables?locked=true'}">Danh sách bàn bị khóa</a>
+                    </div>
+                </div>
                 <div class="row">
-                    <div class="col-4" th:each="x : ${billiardTableResponses}" th:object="${x}">
+                    <div class="col-4 mb-3" th:each="x : ${billiardTableResponses}" th:object="${x}">
                         <img th:if="*{imagePath}" th:src="*{imagePath}">
                         <img class="w-50" th:if="*{imagePath == null}" th:src="@{/image/default-billiard-table-img.jpg}">
                         <p th:text="'Số bàn: ' + *{tableNumber}"></p>
                         <p th:text="*{billiardTableType.name}"></p>
                         <p th:if="*{isLocked}"><i class="bi bi-lock-fill"></i></p>
-                        <a th:if="*{!isOpening}" href="">Mở bàn</a>
+                        <a th:if="*{!isOpening}" th:href="@{'/billiardTables/open?tableNumber=' + *{tableNumber}}">Mở bàn</a>
                         <a th:if="*{isOpening}" href="">Đóng bàn</a>
                     </div>
                     <p th:if="${billiardTableResponses.isEmpty()}" th:text="'Không có bàn nào'"></p>
+                </div>
+                <div class="row">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <li th:class="${'page-item ' + ((pageNumber == billiardTableResponses.getNumber() + 1)? 'active' : '')}" th:each="pageNumber : ${#numbers.sequence(1, billiardTableResponses.totalPages, 1)}">
+                                <a class="page-link" th:if="${!locked}" th:href="@{'/billiardTables?pageNumber=' + ${pageNumber}}" th:text="${pageNumber}">1</a>
+                                <a class="page-link" th:if="${locked}" th:href="@{'/billiardTables?locked=true&pageNumber=' + ${pageNumber}}" th:text="${pageNumber}">1</a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
