@@ -1,6 +1,7 @@
 package com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.controller;
 
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.response.BilliardTableResponse;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BilliardTableClosingException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BilliardTableOpeningException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.security.CustomUserDetails;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.service.BilliardTableService;
@@ -53,8 +54,17 @@ public class BilliardTableController {
     }
 
     @GetMapping("/billiardTables/close")
-    public String closeBilliardTable(@RequestParam(name = "tableNumber", required = true) Long tableNumber) {
+    public String closeBilliardTable(@RequestParam(name = "tableNumber", required = true) Long tableNumber,
+                                     RedirectAttributes redirectAttributes) {
 
-        return "";
+        try {
+            billiardTableService.closeBilliardTable(tableNumber);
+        } catch (BilliardTableClosingException e) {
+            redirectAttributes.addFlashAttribute("unsuccessfulTableClosingMsg", "Đóng bàn thất bại");
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+        redirectAttributes.addFlashAttribute("successfulTableClosingMsg", "Đóng bàn thành công");
+        return "redirect:/billiardTables";
     }
 }

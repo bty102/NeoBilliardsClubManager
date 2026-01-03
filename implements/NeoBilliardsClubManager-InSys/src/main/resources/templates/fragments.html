@@ -27,13 +27,13 @@
 <!--                    </form>-->
                     <div>
                         <div class="d-flex justify-content-between" sec:authorize="hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())">
-                            <img width="25" th:src="@{/image/default-account-img.png}">
+                            <img class="mx-1" width="25" th:src="@{/image/default-account-img.png}">
                             <span>Admin</span>
                         </div>
                         <div class="d-flex justify-content-between" sec:authorize="hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).EMPLOYEE.name())">
 
-                            <img th:if="${#authentication.principal.employeeProfile.imagePath == null}" width="25" th:src="@{/image/default-account-img.png}">
-                            <img th:if="${#authentication.principal.employeeProfile.imagePath != null}" width="25" th:src="@{#authentication.principal.employeeProfile.imagePath}">
+                            <img class="mx-1" th:if="${#authentication.principal.employeeProfile.imagePath == null}" width="25" th:src="@{/image/default-account-img.png}">
+                            <img class="mx-1" th:if="${#authentication.principal.employeeProfile.imagePath != null}" width="25" th:src="@{#authentication.principal.employeeProfile.imagePath}">
                             <span sec:authentication="principal.employeeProfile.fullName"></span>
                         </div>
                     </div>
