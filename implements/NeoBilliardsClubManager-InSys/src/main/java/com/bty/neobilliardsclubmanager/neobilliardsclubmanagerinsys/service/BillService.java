@@ -13,6 +13,7 @@ import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.B
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -111,4 +112,6 @@ public class BillService {
         bill.setTotalAmount(totalAmount);
         billRepository.save(bill);
     }
+
+    public Page<>
 }

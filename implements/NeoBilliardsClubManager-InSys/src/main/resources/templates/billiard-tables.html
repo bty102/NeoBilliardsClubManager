@@ -36,12 +36,12 @@
     </div>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-3">
+            <div class="col-2">
                 <div th:replace="fragments::sidebar">
 
                 </div>
             </div>
-            <div class="col-9">
+            <div class="col-10">
                 <div class="row mb-3">
                     <div class="col-auto">
                         <a sec:authorize="hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())" th:href="@{'/billiardTables?locked=true'}">Danh sách bàn bị khóa</a>
@@ -49,13 +49,29 @@
                 </div>
                 <div class="row">
                     <div class="col-4 mb-3" th:each="x : ${billiardTableResponses}" th:object="${x}">
-                        <img th:if="*{imagePath}" th:src="*{imagePath}">
-                        <img class="w-50" th:if="*{imagePath == null}" th:src="@{/image/default-billiard-table-img.jpg}">
-                        <p th:text="'Số bàn: ' + *{tableNumber}"></p>
-                        <p th:text="*{billiardTableType.name}"></p>
-                        <p th:if="*{isLocked}"><i class="bi bi-lock-fill"></i></p>
-                        <a th:if="*{!isOpening}" th:href="@{'/billiardTables/open?tableNumber=' + *{tableNumber}}">Mở bàn</a>
-                        <a th:if="*{isOpening}" th:href="@{'/billiardTables/close?tableNumber=' + *{tableNumber}}">Đóng bàn</a>
+                        <div th:class="*{'card ' + (isOpening? 'border-success' : '')}">
+                            <img class="card-img-top w-100" th:if="*{imagePath}" th:src="*{imagePath}">
+                            <img class="card-img-top w-100" th:if="*{imagePath == null}" th:src="@{/image/default-billiard-table-img.jpg}">
+                            <div class="card-body">
+                                <h5 class="card-title" th:text="'Bàn số: ' + *{tableNumber}"></h5>
+                                <p class="card-text" th:text="*{billiardTableType.name}"></p>
+                                <p th:if="*{isLocked}">Đã khóa</p>
+                                <a class="btn btn-primary mb-2" onclick="return confirm('Mở bàn này?')" th:if="*{!isOpening and !isLocked}" th:href="@{'/billiardTables/open?tableNumber=' + *{tableNumber}}">Mở bàn</a>
+                                <a class="btn btn-danger mb-2" onclick="return confirm('Đóng bàn này?')" th:if="*{isOpening}" th:href="@{'/billiardTables/close?tableNumber=' + *{tableNumber}}">Đóng bàn</a>
+
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">Hóa đơn</a></li>
+                                        <li><a class="dropdown-item" href="#">Thay đổi ảnh</a></li>
+                                        <li><a class="dropdown-item" href="#">Cập nhật</a></li>
+                                        <li><a class="dropdown-item" href="#">Xóa</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <p th:if="${billiardTableResponses.isEmpty()}" th:text="'Không có bàn nào'"></p>
                 </div>
