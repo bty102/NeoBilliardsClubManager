@@ -1,12 +1,14 @@
 package com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.service;
 
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.request.BillCreationRequest;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.response.BillResponse;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.Account;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.Bill;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.BillDetail;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.BilliardTable;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillCreationException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillUpdateException;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.mapper.BillMapper;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.AccountRepository;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.BillRepository;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.BilliardTableRepository;
@@ -14,6 +16,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -32,6 +37,7 @@ public class BillService {
     final BillRepository billRepository;
     final BilliardTableRepository billiardTableRepository;
     final AccountRepository accountRepository;
+    final BillMapper billMapper;
 
     public void createBill(BillCreationRequest request) {
         BilliardTable billiardTable = billiardTableRepository.findByTableNumber(request.getBilliardTableNumber())
@@ -113,5 +119,29 @@ public class BillService {
         billRepository.save(bill);
     }
 
-    public Page<>
+    // Tham so:
+    //      - pageNumber >= 1
+    //      - pageSize >= 1
+    public Page<BillResponse> findBillsByTableNumber(Long tableNumber, int pageNumber, int pageSize) {
+        if(pageNumber < 1) pageNumber = 1;
+        if(pageSize < 1) pageSize = 1;
+
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(pageNumber-1, pageSize, sort);
+        return billRepository.findByBilliardTable_TableNumber(tableNumber, pageable)
+                .map(bill -> billMapper.toBillResponse(bill));
+    }
+
+    // Tham so:
+    //      - pageNumber >= 1
+    //      - pageSize >= 1
+    public Page<BillResponse> getBills(int pageNumber, int pageSize) {
+        if(pageNumber < 1) pageNumber = 1;
+        if(pageSize < 1) pageSize = 1;
+
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(pageNumber-1, pageSize, sort);
+        return billRepository.findAll(pageable)
+                .map(bill -> billMapper.toBillResponse(bill));
+    }
 }

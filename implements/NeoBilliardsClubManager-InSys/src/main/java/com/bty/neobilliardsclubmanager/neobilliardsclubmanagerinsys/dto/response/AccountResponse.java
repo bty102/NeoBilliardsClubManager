@@ -11,23 +11,17 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class BillResponse {
+public class AccountResponse {
 
     Long id;
 
-    LocalDateTime checkInTime;
+    String username;
 
-    LocalDateTime checkOutTime;
+    Integer role;
 
-    Long totalAmount;
+    Boolean isLocked;
 
     LocalDateTime createdAt;
 
-    Boolean paid;
-
-    BilliardTableResponse billiardTable;
-
-    MemberResponse member;
-
-    AccountResponse account;
+    EmployeeProfileResponse employeeProfile;
 }

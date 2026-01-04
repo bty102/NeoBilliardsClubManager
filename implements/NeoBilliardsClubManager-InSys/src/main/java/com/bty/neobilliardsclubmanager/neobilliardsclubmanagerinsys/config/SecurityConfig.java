@@ -21,6 +21,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
+                        .defaultSuccessUrl("/billiardTables")
                         .permitAll()
                 )
                 .logout(logout -> logout

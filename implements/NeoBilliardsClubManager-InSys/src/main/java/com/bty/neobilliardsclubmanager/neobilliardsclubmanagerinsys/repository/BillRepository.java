@@ -15,4 +15,6 @@ public interface BillRepository extends JpaRepository<Bill, Long> {
     Optional<Bill> findByBilliardTableAndCheckOutTime(BilliardTable billiardTable, LocalDateTime checkOutTime);
 
     Page<Bill> findByBilliardTable_TableNumber(Long tableNumber, Pageable pageable);
+
+    Page<Bill> findAll(Pageable pageable);
 }
