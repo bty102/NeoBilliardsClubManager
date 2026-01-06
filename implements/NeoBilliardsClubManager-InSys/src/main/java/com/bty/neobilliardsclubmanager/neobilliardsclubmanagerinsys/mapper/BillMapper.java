@@ -25,7 +25,7 @@ public class BillMapper {
                 .createdAt(bill.getCreatedAt())
                 .paid(bill.getPaid())
                 .billiardTable(billiardTableMapper.toBilliardTableResponse(bill.getBilliardTable()))
-                .member(memberMapper.toMemberResponse(bill.getMember()))
+                .member((bill.getMember() == null)? null : memberMapper.toMemberResponse(bill.getMember()))
                 .account(accountMapper.toAccountResponse(bill.getAccount()))
                 .build();
     }

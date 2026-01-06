@@ -82,11 +82,11 @@
                                 <a class="btn btn-danger mb-2" onclick="return confirm('Đóng bàn này?')" th:if="*{isOpening}" th:href="@{'/billiardTables/close?tableNumber=' + *{tableNumber}}">Đóng bàn</a>
 
                                 <div class="dropdown">
-                                    <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <button class="btn btn-light btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="bi bi-three-dots"></i>
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">Hóa đơn</a></li>
+                                        <li><a class="dropdown-item" th:href="@{'/bills?tableNumber=' + *{tableNumber}}">Hóa đơn</a></li>
                                         <li><a class="dropdown-item" href="#">Thay đổi ảnh</a></li>
                                         <li><a class="dropdown-item" href="#">Cập nhật</a></li>
                                         <li><a class="dropdown-item" href="#">Xóa</a></li>

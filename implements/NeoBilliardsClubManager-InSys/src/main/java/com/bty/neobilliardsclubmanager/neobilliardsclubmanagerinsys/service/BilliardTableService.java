@@ -6,6 +6,7 @@ import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.Bill;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.BilliardTable;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillCreationException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BilliardTableClosingException;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BilliardTableNotFoundException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BilliardTableOpeningException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.mapper.BilliardTableMapper;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.BillRepository;
@@ -88,6 +89,13 @@ public class BilliardTableService {
         billService.updateCheckOutTime(bill.getId(), LocalDateTime.now());
         billiardTable.setIsOpening(false);
         billiardTableRepository.save(billiardTable);
+    }
+
+    public BilliardTableResponse getBilliardTableByTableNumber(Long tableNumber) {
+        BilliardTable billiardTable = billiardTableRepository.findByTableNumber(tableNumber)
+                .orElseThrow(() -> {throw new BilliardTableNotFoundException("Không tìm thấy bàn");
+                });
+        return billiardTableMapper.toBilliardTableResponse(billiardTable);
     }
 
 }

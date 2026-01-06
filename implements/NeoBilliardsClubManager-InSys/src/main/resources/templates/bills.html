@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Hóa đơn</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div th:replace="fragments::header">
+
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-2">
+                <div th:replace="fragments::sidebar">
+
+                </div>
+            </div>
+            <div class="col-10">
+                <table class="table table-striped caption-top">
+                    <caption>Danh sách hóa đơn</caption>
+                     <thead>
+                        <tr>
+                            <th>Mã hóa đơn</th>
+                            <th>Thời điểm vào</th>
+                            <th>Thời điểm ra</th>
+                            <th>Tổng tiền</th>
+                            <th>Thời điểm tạo</th>
+                            <th>Thanh toán</th>
+                            <th colspan="2">Bàn</th>
+                            <th colspan="2">Hội viên</th>
+                            <th>Người tạo</th>
+                        </tr>
+                     </thead>
+                    <tbody>
+                        <tr th:each="bill : ${billResponses}" th:object="${bill}">
+                            <td th:text="*{id}"></td>
+                            <td th:text="*{#temporals.format(checkInTime, 'dd/MM/yyyy HH:mm:ss')}"></td>
+                            <td th:if="*{checkOutTime != null}" th:text="*{#temporals.format(checkOutTime, 'dd/MM/yyyy HH:mm:ss')}"></td>
+                            <td th:if="*{checkOutTime == null}">N/A</td>
+                            <td th:if="*{totalAmount != null}" th:text="*{totalAmount + ' VNĐ'}"></td>
+                            <td th:if="*{totalAmount == null}">N/A</td>
+                            <td th:text="*{#temporals.format(createdAt, 'dd/MM/yyyy HH:mm:ss')}"></td>
+                            <td th:if="*{paid}">Đã thanh toán</td>
+                            <td th:if="*{!paid}">Chưa thanh toán</td>
+                            <td th:text="*{'Bàn số: ' + billiardTable.tableNumber}"></td>
+                            <td th:text="*{'Đơn giá: ' + billiardTable.billiardTableType.pricePerHour + ' VNĐ'}"></td>
+                            <td th:if="*{member != null}" th:text="*{member.fullName}"></td>
+                            <td th:if="*{member != null}" th:text="*{member.email}"></td>
+                            <td colspan="2" th:if="*{member == null}">Không có</td>
+                            <td th:if="*{account.role == 1}">Admin</td>
+                            <td th:if="*{account.role == 2}" th:text="*{account.employeeProfile.fullName}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li th:class="${'page-item ' + ((pageNumber == billResponses.getNumber() + 1)? 'active' : '')}" th:each="pageNumber : ${#numbers.sequence(1, billResponses.totalPages, 1)}">
+                            <a th:if="${tableNumber == null}" class="page-link" th:href="@{'/bills?pageNumber=' + ${pageNumber}}" th:text="${pageNumber}"></a>
+                            <a th:if="${tableNumber != null}" class="page-link" th:href="@{'/bills?pageNumber=' + ${pageNumber} + '&tableNumber=' + ${tableNumber}}" th:text="${pageNumber}"></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

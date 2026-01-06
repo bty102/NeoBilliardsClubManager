@@ -21,7 +21,7 @@ public class AccountMapper {
                 .role(account.getRole())
                 .isLocked(account.getIsLocked())
                 .createdAt(account.getCreatedAt())
-                .employeeProfile(employeeProfileMapper.toEmployeeProfileResponse(account.getEmployeeProfile()))
+                .employeeProfile((account.getEmployeeProfile() == null)? null : employeeProfileMapper.toEmployeeProfileResponse(account.getEmployeeProfile()))
                 .build();
     }
 }
