@@ -25,7 +25,7 @@ public class MemberMapper {
                 .username(member.getUsername())
                 .isLocked(member.getIsLocked())
                 .createdAt(member.getCreatedAt())
-                .memberLevel(memberLevelMapper.toMemberLevelResponse(member.getMemberLevel()))
+                .memberLevel((member.getMemberLevel() == null)? null : memberLevelMapper.toMemberLevelResponse(member.getMemberLevel()))
                 .build();
     }
 }

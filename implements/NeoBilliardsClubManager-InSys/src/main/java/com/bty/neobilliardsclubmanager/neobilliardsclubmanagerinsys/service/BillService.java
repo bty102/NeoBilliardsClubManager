@@ -2,16 +2,16 @@ package com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.service;
 
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.request.BillCreationRequest;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.response.BillResponse;
-import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.Account;
-import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.Bill;
-import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.BillDetail;
-import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.BilliardTable;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.*;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillCreationException;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillNotFoundException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillUpdateException;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.MemberNotFoundException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.mapper.BillMapper;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.AccountRepository;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.BillRepository;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.BilliardTableRepository;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.MemberRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -38,6 +38,7 @@ public class BillService {
     final BilliardTableRepository billiardTableRepository;
     final AccountRepository accountRepository;
     final BillMapper billMapper;
+    final MemberRepository memberRepository;
 
     public void createBill(BillCreationRequest request) {
         BilliardTable billiardTable = billiardTableRepository.findByTableNumber(request.getBilliardTableNumber())
@@ -110,7 +111,7 @@ public class BillService {
             totalAmount += billDetail.getProduct().getPrice() * billDetail.getQuantity();
         }
         long billTotalDiscountPercentage = 0;// Phan tram giam gia tren tong hoa don
-        if(bill.getMember() != null) {
+        if(bill.getMember() != null && bill.getMember().getMemberLevel() != null) {
             billTotalDiscountPercentage = bill.getMember().getMemberLevel().getBillTotalDiscountPercentage();
         }
         totalAmount = totalAmount - (long)(totalAmount * (billTotalDiscountPercentage/100.0));
@@ -143,5 +144,37 @@ public class BillService {
         Pageable pageable = PageRequest.of(pageNumber-1, pageSize, sort);
         return billRepository.findAll(pageable)
                 .map(bill -> billMapper.toBillResponse(bill));
+    }
+
+    public BillResponse getBillById(Long id) {
+        Bill bill = billRepository.findById(id)
+                .orElseThrow(() -> {throw new BillNotFoundException("Không tìm thấy hóa đơn");
+                });
+        return billMapper.toBillResponse(bill);
+    }
+
+    @PreAuthorize("hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name()) or @billService.isOwnerOfBill(#billId, authentication.principal.id)")
+    @Transactional(rollbackFor = Exception.class)
+    public void updateMemberOfBill(Long billId, Long memberId) {
+        Bill bill = billRepository.findById(billId)
+                .orElseThrow(() -> {throw new BillNotFoundException("Không tìm thấy hóa đơn");});
+
+        if(bill.getPaid()) {
+            throw new BillUpdateException("Hóa đơn đã thanh toán, không thể cập nhật hội viên");
+        }
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> {throw new MemberNotFoundException("Không tim thấy hội viên");
+                });
+        if(member.getIsLocked()) {
+
+            throw new BillUpdateException("Hội viên đã bị khóa, không thể cập nhật hội viên này cho hóa đơn");
+        }
+
+        bill.setMember(member);
+        billRepository.save(bill);
+
+        if(bill.getCheckOutTime() != null)
+            calculateAndUpdateTotalAmount(billId);
     }
 }

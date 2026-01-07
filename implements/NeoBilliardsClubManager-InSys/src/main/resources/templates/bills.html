@@ -51,7 +51,7 @@
                             <th>Thời điểm tạo</th>
                             <th>Thanh toán</th>
                             <th colspan="2">Bàn</th>
-                            <th colspan="2">Hội viên</th>
+                            <th>Hội viên</th>
                             <th>Người tạo</th>
                         </tr>
                      </thead>
@@ -68,9 +68,41 @@
                             <td th:if="*{!paid}">Chưa thanh toán</td>
                             <td th:text="*{'Bàn số: ' + billiardTable.tableNumber}"></td>
                             <td th:text="*{'Đơn giá: ' + billiardTable.billiardTableType.pricePerHour + ' VNĐ'}"></td>
-                            <td th:if="*{member != null}" th:text="*{member.fullName}"></td>
-                            <td th:if="*{member != null}" th:text="*{member.email}"></td>
-                            <td colspan="2" th:if="*{member == null}">Không có</td>
+                            <td th:if="*{member != null}">
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"  th:data-bs-target="'#' + *{id}">
+                                    Xem
+                                </button>
+
+                                <!-- Modal -->
+                                <div class="modal fade" th:id="*{id}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="exampleModalLabel">Hội viên</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <h3 th:text="*{member.fullName}"></h3>
+                                                <p><img width="200" th:src="*{member.imagePath}"></p>
+                                                <p th:if="*{member.isMale}">Nam</p>
+                                                <p th:if="*{!member.isMale}">Nữ</p>
+                                                <p th:text="*{#temporals.format(member.dateOfBirth, 'dd/MM/yyyy')}"></p>
+                                                <p th:text="*{member.email}"></p>
+                                                <p th:if="*{member.memberLevel}" th:text="*{member.memberLevel.name}"></p>
+                                                <p th:if="*{member.memberLevel == null}">Không thuộc cấp độ hội viên nào</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                <a class="btn btn-primary" th:href="@{'bills/updateMember?billId=' + *{id}}">Cập nhật</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td th:if="*{member == null}">
+                                <a class="btn btn-secondary" th:href="@{'bills/updateMember?billId=' + *{id}}">Thêm</a>
+                            </td>
                             <td th:if="*{account.role == 1}">Admin</td>
                             <td th:if="*{account.role == 2}" th:text="*{account.employeeProfile.fullName}"></td>
                         </tr>
