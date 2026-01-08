@@ -59,6 +59,13 @@
                         </tr>
                     </tbody>
                 </table>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li th:class="${'page-item ' + ((pageNumber == memberResponses.getNumber() + 1)? 'active' : '')}" th:each="pageNumber : ${#numbers.sequence(1, memberResponses.getTotalPages(), 1)}">
+                            <a class="page-link" th:href="@{'bills/updateMember?billId=' + ${billResponse.id} + '&pageNumber=' + ${pageNumber}}" th:text="${pageNumber}"></a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
 
         </div>

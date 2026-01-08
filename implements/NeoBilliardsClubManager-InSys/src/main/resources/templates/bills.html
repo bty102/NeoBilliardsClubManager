@@ -53,6 +53,7 @@
                             <th colspan="2">Bàn</th>
                             <th>Hội viên</th>
                             <th>Người tạo</th>
+                            <th></th>
                         </tr>
                      </thead>
                     <tbody>
@@ -105,6 +106,17 @@
                             </td>
                             <td th:if="*{account.role == 1}">Admin</td>
                             <td th:if="*{account.role == 2}" th:text="*{account.employeeProfile.fullName}"></td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" th:href="@{'/bills/updateProducts?billId=' + *{id}}">Mặt hàng</a></li>
+                                        <li><a class="dropdown-item" href="#">Mã thanh toán</a></li>
+                                    </ul>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

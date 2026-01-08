@@ -1,21 +1,27 @@
 package com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.controller;
 
-import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.response.BillResponse;
-import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.response.BilliardTableResponse;
-import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.response.MemberResponse;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.request.BillDetailCreationRequest;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.request.BillDetailUpdateRequest;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.response.*;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillDetailCreationException;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillDetailUpdateException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BilliardTableNotFoundException;
-import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.service.BillService;
-import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.service.BilliardTableService;
-import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.service.MemberService;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.service.*;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -25,6 +31,8 @@ public class BillController {
     final BillService billService;
     final BilliardTableService billiardTableService;
     final MemberService memberService;
+    final BillDetailService billDetailService;
+    final ProductService productService;
 
     @GetMapping("/bills")
     public String getBills(@RequestParam(name = "tableNumber", required = false) Long tableNumber,
@@ -73,5 +81,83 @@ public class BillController {
         billService.updateMemberOfBill(billId, memberId);
 //        redirectAttributes.addFlashAttribute("");
         return "redirect:/bills/updateMember?billId=" + billId;
+    }
+
+    @GetMapping("bills/updateProducts")
+    public String showUpdateProductsOfBill(@RequestParam(name = "billId", required = true) Long billId,
+                                           Model model) {
+
+        BillResponse billResponse = billService.getBillById(billId);
+        model.addAttribute("billResponse", billResponse);
+
+        List<BillDetailResponse> billDetailResponses = billDetailService.getAllBillDetailsByBillId(billId);
+        model.addAttribute("billDetailReponses", billDetailResponses);
+
+        List<ProductResponse> productResponses = productService.findProductsByIsLocked(false);
+        model.addAttribute("productResponses", productResponses);
+
+        return "update-products-of-bill";
+    }
+
+    @PostMapping("bills/updateProducts/add")
+    public String addProductForBill(@Valid @ModelAttribute("billDetailCreationRequest") BillDetailCreationRequest request,
+                                    BindingResult bindingResult,
+                                    Model model,
+                                    RedirectAttributes redirectAttributes) {
+
+        if(bindingResult.hasErrors()) {
+
+            BillResponse billResponse = billService.getBillById(request.getBillId());
+            model.addAttribute("billResponse", billResponse);
+
+            List<BillDetailResponse> billDetailResponses = billDetailService.getAllBillDetailsByBillId(request.getBillId());
+            model.addAttribute("billDetailReponses", billDetailResponses);
+
+            List<ProductResponse> productResponses = productService.findProductsByIsLocked(false);
+            model.addAttribute("productResponses", productResponses);
+
+            return "update-products-of-bill";
+        }
+
+        try {
+            billDetailService.createBillDetail(request);
+        } catch (BillDetailCreationException e) {
+            redirectAttributes.addFlashAttribute("unsuccessfulBillDetailCreationMsg", e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return "redirect:/bills/updateProducts?billId=" + request.getBillId();
+    }
+
+    @PostMapping("bills/updateProducts/edit")
+    public String editProductForBill(@Valid @ModelAttribute("billDetailUpdateRequest") BillDetailUpdateRequest request,
+                                     BindingResult bindingResult,
+                                     Model model,
+                                     RedirectAttributes redirectAttributes,
+                                     @RequestParam(name = "billId") Long billId) {
+
+        if(bindingResult.hasErrors()) {
+
+            BillResponse billResponse = billService.getBillById(billId);
+            model.addAttribute("billResponse", billResponse);
+
+            List<BillDetailResponse> billDetailResponses = billDetailService.getAllBillDetailsByBillId(billId);
+            model.addAttribute("billDetailReponses", billDetailResponses);
+
+            List<ProductResponse> productResponses = productService.findProductsByIsLocked(false);
+            model.addAttribute("productResponses", productResponses);
+
+            return "update-products-of-bill";
+        }
+
+        try {
+            billDetailService.updateBillDetail(request);
+        } catch (BillDetailUpdateException e) {
+            redirectAttributes.addFlashAttribute("unsuccessfulBillDetailUpdateMsg", e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return "redirect:/bills/updateProducts?billId=" + billId;
     }
 }
