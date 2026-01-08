@@ -7,6 +7,8 @@ import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.Bill;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.BillDetail;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.Product;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillDetailCreationException;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillDetailDeletionException;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillDetailNotFoundException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillDetailUpdateException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.mapper.BillDetailMapper;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.BillDetailRepository;
@@ -100,5 +102,28 @@ public class BillDetailService {
             return true;
         }
         return false;
+    }
+
+//    @PreAuthorize("hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name()) or @billDetailService.isOwnerOfBillDetail(#request.id, authentication.principal.id)")
+//    @Transactional(rollbackFor = Exception.class)
+//    public void deleteBillDetailById(Long id) {
+//        BillDetail billDetail = billDetailRepository.findById(id)
+//                .orElseThrow(() -> {throw new BillDetailNotFoundException("Không tìm thấy chi tiết hóa đơn");
+//                });
+//        if(billDetail.getBill().getPaid()) {
+//            throw new BillDetailDeletionException("Hóa đơn đã thanh toán, khôn thể xóa chi tiết hóa đơn");
+//        }
+//
+//        billDetailRepository.deleteById(id);
+//
+//        if(billDetail.getBill().getCheckOutTime() != null) {
+//            billService.calculateAndUpdateTotalAmount(billDetail.getBill().getId());
+//        }
+//    }
+
+    public BillDetailResponse getBillDetailById(Long id) {
+        BillDetail billDetail = billDetailRepository.findById(id)
+                .orElseThrow(() -> {throw new BillDetailNotFoundException("Không tìm thấy chi tiết hóa đơn");});
+        return billDetailMapper.toBillDetailResponse(billDetail);
     }
 }

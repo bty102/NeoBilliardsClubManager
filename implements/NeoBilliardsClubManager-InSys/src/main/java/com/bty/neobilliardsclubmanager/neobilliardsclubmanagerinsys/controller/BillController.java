@@ -160,4 +160,15 @@ public class BillController {
         }
         return "redirect:/bills/updateProducts?billId=" + billId;
     }
+
+//    @GetMapping("bills/updateProducts/delete")
+//    public String deleteProductOfBill(@RequestParam(name = "billDetailId", required = true) Long billDetailId
+//                                      ) {
+//
+//        BillDetailResponse billDetailResponse = billDetailService.getBillDetailById(billDetailId);
+//
+//        billDetailService.deleteBillDetailById(billDetailId);
+//
+//        return "redirect:/bills/updateProducts?billId=" + billDetailResponse.getBill().getId();
+//    }
 }
