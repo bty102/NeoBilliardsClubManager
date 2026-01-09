@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách mặt hàng</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div th:replace="fragments::header">
+
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-2">
+            <div th:replace="fragments::sidebar">
+
+            </div>
+        </div>
+        <div class="col-10">
+            <div class="row justify-content-between">
+                <div class="col-auto">
+                    <form th:action="@{/products}" method="get">
+                        <div class="row">
+                            <div class="col-auto">
+                                <input class="form-control" type="text" name="key" placeholder="Nhập tên mặt hàng...">
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-primary" type="submit">Tìm</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-auto">
+                    <a sec:authorize="hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())" th:href="@{/products/create}">Thêm</a>
+                </div>
+            </div>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Mã sản phẩm</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Giá</th>
+                        <th>Mô tả</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="x : ${productResponses}" th:object="${x}">
+                        <td th:text="*{id}"></td>
+                        <td th:text="*{name}"></td>
+                        <td th:text="*{price + ' VNĐ'}"></td>
+                        <td th:text="*{description}"></td>
+                        <td>
+                            <a sec:authorize="hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())" th:href="@{'/products/update/' + *{id}}">Cập nhật</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

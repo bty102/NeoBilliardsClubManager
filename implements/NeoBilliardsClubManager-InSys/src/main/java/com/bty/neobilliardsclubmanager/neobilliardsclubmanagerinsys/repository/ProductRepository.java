@@ -9,4 +9,8 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByIsLocked(Boolean isLocked);
+
+    List<Product> findByNameContaining(String name);
+
+    boolean existsByName(String name);
 }
