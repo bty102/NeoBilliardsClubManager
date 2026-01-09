@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách nhân viên</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div th:replace="fragments::header">
+
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-2">
+            <div th:replace="fragments::sidebar">
+
+            </div>
+        </div>
+        <div class="col-10">
+            <div class="row justify-content-between">
+                <div class="col-auto">
+                    <form th:action="@{/accounts/employees}" method="get">
+                        <div class="row">
+                            <div class="col-auto">
+                                <input class="form-control" type="text" name="key" placeholder="Nhập họ tên hoặc địa chỉ...">
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-primary" type="submit">Tìm</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-auto">
+                    <a th:href="@{/accounts/employees/create}">Thêm</a>
+                </div>
+            </div>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Mã tài khoản</th>
+                        <th>Họ tên</th>
+                        <th>Giới tính</th>
+                        <th>Ngày sinh</th>
+                        <th>Địa chỉ</th>
+                        <th>Số điện thoại</th>
+                        <th>Số CCCD</th>
+                        <th>Email</th>
+                        <th>Ảnh</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="x : ${employees}" th:object="${x}">
+                        <td th:text="*{id}"></td>
+                        <td th:text="*{employeeProfile.fullName}"></td>
+                        <td th:if="*{employeeProfile.isMale}">Nam</td>
+                        <td th:if="*{!employeeProfile.isMale}">Nữ</td>
+                        <td th:text="*{#temporals.format(employeeProfile.dateOfBirth, 'dd/MM/yyyy')}"></td>
+                        <td th:text="*{employeeProfile.address}"></td>
+                        <td th:text="*{employeeProfile.phoneNumber}"></td>
+                        <td th:text="*{employeeProfile.citizenIDNumber}"></td>
+                        <td th:text="*{employeeProfile.email}"></td>
+                        <td><img th:src="*{employeeProfile.imagePath}"></td>
+                        <td>
+                            <a th:href="@{'/employeeProfiles/update/' + *{employeeProfile.id}}">Cập nhật</a>
+                            <a th:if="*{!isLocked}" onclick="return confirm('Khóa tài khoản này?')" th:href="@{'/accounts/employees/lock/' + *{id}}">Khóa</a>
+                            <a th:if="*{isLocked}" onclick="return confirm('Mở khóa tài khoản này?')" th:href="@{'/accounts/employees/unlock/' + *{id}}">Mở khóa</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div th:if="${employees.isEmpty()}">
+                <span>Không có nhân viên nào</span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
