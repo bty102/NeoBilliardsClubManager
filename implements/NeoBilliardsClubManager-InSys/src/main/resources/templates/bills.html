@@ -22,6 +22,28 @@
             timer: 3000
         });
     </script>
+    <script th:if="${unsuccessfulBillPaymentConfirmationMsg}" th:inline="javascript">
+        Swal.fire({
+            text: [[${unsuccessfulBillPaymentConfirmationMsg}]],
+            toast: true,
+            showConfirmButton: false,
+            showCloseButton: true,
+            position: 'top-end',
+            icon: 'error',
+            timer: 3000
+        });
+    </script>
+    <script th:if="${successfulBillPaymentConfirmationMsg}" th:inline="javascript">
+        Swal.fire({
+            text: [[${successfulBillPaymentConfirmationMsg}]],
+            toast: true,
+            showConfirmButton: false,
+            showCloseButton: true,
+            position: 'top-end',
+            icon: 'success',
+            timer: 3000
+        });
+    </script>
 
     <div th:replace="fragments::header">
 
@@ -113,7 +135,8 @@
                                     </button>
                                     <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" th:href="@{'/bills/updateProducts?billId=' + *{id}}">Mặt hàng</a></li>
-                                        <li><a class="dropdown-item" href="#">Mã thanh toán</a></li>
+                                        <li><a class="dropdown-item" th:href="@{'/bills/qr/' + *{id}}">Mã thanh toán</a></li>
+                                        <li><a class="dropdown-item" onclick="return confirm('Xác nhận hóa đơn này đã được thanh toán?')" th:href="@{'/bills/confirmPayment/' + *{id}}">Xác nhận đã thanh toán</a></li>
                                     </ul>
                                 </div>
                             </td>

@@ -5,6 +5,7 @@ import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.request.
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.response.*;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillDetailCreationException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillDetailUpdateException;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillPaymentConfirmationException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BilliardTableNotFoundException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.service.*;
 import jakarta.validation.Valid;
@@ -15,10 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -171,4 +169,42 @@ public class BillController {
 //
 //        return "redirect:/bills/updateProducts?billId=" + billDetailResponse.getBill().getId();
 //    }
+
+    @GetMapping("/bills/qr/{billId}")
+    public String showQRCodeOfBill(@PathVariable(name = "billId") Long billId,
+                                   Model model) {
+
+        // https://www.vietqr.io/danh-sach-api/link-tao-ma-nhanh/
+        // https://img.vietqr.io/image/<BANK_ID>-<ACCOUNT_NO>-<TEMPLATE>.png?amount=<AMOUNT>&addInfo=<DESCRIPTION>&accountName=<ACCOUNT_NAME>
+        String BANK_ID = "970415";
+        String ACCOUNT_NO = "113366668888";
+        String TEMPLATE = "print";
+
+        BillResponse billResponse = billService.getBillById(billId);
+        if(billResponse.getCheckOutTime() == null) {
+            model.addAttribute("msg", "Hóa đơn đang được xử lý");
+            return "qrcode-of-bill";
+        }
+        Long amount = billResponse.getTotalAmount();
+        String addInfo = "Chuyển tiền bắn bida - HD " + billResponse.getId();
+
+        String QR_URL = String.format("https://img.vietqr.io/image/%s-%s-%s.png?amount=%s&addInfo=%s", BANK_ID, ACCOUNT_NO, TEMPLATE, amount.toString(), addInfo);
+        model.addAttribute("QR_URL", QR_URL);
+        return "qrcode-of-bill";
+    }
+
+    @GetMapping("/bills/confirmPayment/{billId}")
+    public String confirmPaymentForBill(@PathVariable(name = "billId") Long billId,
+                                        RedirectAttributes redirectAttributes) {
+
+        try {
+            billService.confirmPayment(billId);
+            redirectAttributes.addFlashAttribute("successfulBillPaymentConfirmationMsg", "Xác nhận thành công");
+        } catch (BillPaymentConfirmationException e) {
+            redirectAttributes.addFlashAttribute("unsuccessfulBillPaymentConfirmationMsg", e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return "redirect:/bills";
+    }
 }

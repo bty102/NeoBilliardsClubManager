@@ -3,10 +3,7 @@ package com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.service;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.request.BillCreationRequest;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.response.BillResponse;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.*;
-import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillCreationException;
-import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillNotFoundException;
-import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.BillUpdateException;
-import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.MemberNotFoundException;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.*;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.mapper.BillMapper;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.AccountRepository;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.BillRepository;
@@ -39,6 +36,7 @@ public class BillService {
     final AccountRepository accountRepository;
     final BillMapper billMapper;
     final MemberRepository memberRepository;
+    final MemberService memberService;
 
     public void createBill(BillCreationRequest request) {
         BilliardTable billiardTable = billiardTableRepository.findByTableNumber(request.getBilliardTableNumber())
@@ -176,5 +174,27 @@ public class BillService {
 
         if(bill.getCheckOutTime() != null)
             calculateAndUpdateTotalAmount(billId);
+    }
+
+    @PreAuthorize("hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name()) or @billService.isOwnerOfBill(#billId, authentication.principal.id)")
+    @Transactional(rollbackFor = Exception.class)
+    public void confirmPayment(Long billId) {
+        Bill bill = billRepository.findById(billId)
+                .orElseThrow(() -> {throw new BillNotFoundException("Không tìm thấy hóa đơn");});
+
+        if(bill.getPaid()) {
+            throw new BillPaymentConfirmationException("Hóa đơn đã được thanh toán");
+        }
+
+        if(bill.getCheckOutTime() == null) {
+            throw new BillPaymentConfirmationException("Hóa đơn đang được xử lý");
+        }
+
+        bill.setPaid(true);
+        billRepository.save(bill);
+
+        if(bill.getMember() != null) {
+            memberService.updateMemberLevelForMember(bill.getMember().getId());
+        }
     }
 }

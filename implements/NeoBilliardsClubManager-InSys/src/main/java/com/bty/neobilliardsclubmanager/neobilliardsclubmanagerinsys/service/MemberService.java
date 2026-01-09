@@ -1,7 +1,12 @@
 package com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.service;
 
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.response.MemberResponse;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.Bill;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.Member;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.MemberLevel;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.MemberNotFoundException;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.mapper.MemberMapper;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.MemberLevelRepository;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.repository.MemberRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +14,11 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +27,7 @@ public class MemberService {
 
     final MemberRepository memberRepository;
     final MemberMapper memberMapper;
+    final MemberLevelRepository memberLevelRepository;
 
     // Tham so:
     //      - pageNumber >= 1
@@ -29,5 +39,31 @@ public class MemberService {
         Pageable pageable = PageRequest.of(pageNumber-1, pageSize);
         return memberRepository.findAll(pageable)
                 .map(member -> memberMapper.toMemberResponse(member));
+    }
+
+    public void updateMemberLevelForMember(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> {throw new MemberNotFoundException("Không tìm thấy hội viên");
+                });
+        double hoursPlayedOfMember = 0;
+        List<Bill> bills = member.getBills();
+        for(Bill bill : bills) {
+
+            if(bill.getCheckOutTime() == null) continue;
+
+            Duration duration = Duration.between(bill.getCheckInTime(), bill.getCheckOutTime());
+            double hoursPlayed = duration.toMinutes()/60.0;// So gio da choi
+            hoursPlayedOfMember += hoursPlayed;
+        }
+
+        Sort sort = Sort.by("requiredPlaytimeHours").descending();
+        List<MemberLevel> memberLevels = memberLevelRepository.findAll(sort);
+        for(MemberLevel memberLevel : memberLevels) {
+            if(hoursPlayedOfMember >= memberLevel.getRequiredPlaytimeHours()) {
+                member.setMemberLevel(memberLevel);
+                break;
+            }
+        }
+        memberRepository.save(member);
     }
 }
