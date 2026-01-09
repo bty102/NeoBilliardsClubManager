@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload image</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div th:replace="fragments::header">
+
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-2">
+                <div th:replace="fragments::sidebar"></div>
+            </div>
+
+            <div class="col-10">
+                <h2>Cập nhật hình ảnh</h2>
+
+                <div th:object="${billiardTableResponse}">
+                    <h3>Bàn số <span th:text="*{tableNumber}"></span></h3>
+                </div>
+
+                <form th:action="@{/billiardTables/uploadImage}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="tableNumber" th:value="${billiardTableResponse.tableNumber}">
+                    <div class="row">
+                        <div class="col-auto">
+                            <input class="form-control" type="file" name="imageFile">
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-primary" type="submit">Upload</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -53,6 +53,17 @@
             timer: 3000
         });
     </script>
+    <script th:if="${unsuccessfulBilliardTableImageSavingMsg}" th:inline="javascript">
+        Swal.fire({
+            text: [[${unsuccessfulBilliardTableImageSavingMsg}]],
+            toast: true,
+            showConfirmButton: false,
+            showCloseButton: true,
+            position: 'top-end',
+            icon: 'error',
+            timer: 3000
+        });
+    </script>
     <div th:replace="fragments::header">
 
     </div>
@@ -68,12 +79,15 @@
                     <div class="col-auto">
                         <a sec:authorize="hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())" th:href="@{'/billiardTables?locked=true'}">Danh sách bàn bị khóa</a>
                     </div>
+                    <div class="col-auto">
+                        <a sec:authorize="hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())" th:href="@{/billiardTables/create}">Thêm mới bàn</a>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-4 mb-3" th:each="x : ${billiardTableResponses}" th:object="${x}">
                         <div th:class="*{'card ' + (isOpening? 'border-success' : '')}">
-                            <img class="card-img-top w-100" th:if="*{imagePath}" th:src="*{imagePath}">
-                            <img class="card-img-top w-100" th:if="*{imagePath == null}" th:src="@{/image/default-billiard-table-img.jpg}">
+                            <img height="250" class="card-img-top w-100" th:if="*{imagePath}" th:src="*{imagePath}">
+                            <img height="250" class="card-img-top w-100" th:if="*{imagePath == null}" th:src="@{/image/default-billiard-table-img.jpg}">
                             <div class="card-body">
                                 <h5 class="card-title" th:text="'Bàn số: ' + *{tableNumber}"></h5>
                                 <p class="card-text" th:text="*{billiardTableType.name}"></p>
@@ -87,9 +101,18 @@
                                     </button>
                                     <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" th:href="@{'/bills?tableNumber=' + *{tableNumber}}">Hóa đơn</a></li>
-                                        <li><a class="dropdown-item" href="#">Thay đổi ảnh</a></li>
-                                        <li><a class="dropdown-item" href="#">Cập nhật</a></li>
-                                        <li><a class="dropdown-item" href="#">Xóa</a></li>
+                                        <li sec:authorize="hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())">
+                                            <a class="dropdown-item" th:href="@{'/billiardTables/uploadImage?tableNumber=' + *{tableNumber}}">Thay đổi ảnh</a>
+                                        </li>
+                                        <li sec:authorize="hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())">
+                                            <a class="dropdown-item" th:href="@{'/billiardTables/update/' + *{tableNumber}}">Cập nhật</a>
+                                        </li>
+                                        <li th:if="*{!isLocked}" sec:authorize="hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())">
+                                            <a onclick="return confirm('Khóa bàn này?')" class="dropdown-item" th:href="@{'/billiardTables/lock/' + *{tableNumber}}">Khóa</a>
+                                        </li>
+                                        <li th:if="*{isLocked}" sec:authorize="hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())">
+                                            <a onclick="return confirm('Mở khóa bàn này?')" class="dropdown-item" th:href="@{'/billiardTables/unlock/' + *{tableNumber}}">Mở khóa</a>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>

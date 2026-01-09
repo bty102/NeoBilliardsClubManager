@@ -14,4 +14,6 @@ public interface BilliardTableRepository extends JpaRepository<BilliardTable, Lo
     Page<BilliardTable> findByIsLocked(Boolean isLocked, Pageable pageable);
 
     Optional<BilliardTable> findByTableNumber(Long tableNumber);
+
+    boolean existsByTableNumber(Long tableNumber);
 }
