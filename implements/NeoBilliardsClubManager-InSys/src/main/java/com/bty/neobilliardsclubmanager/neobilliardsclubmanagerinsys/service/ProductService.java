@@ -80,4 +80,20 @@ public class ProductService {
         Product product = productMapper.toProduct(request);
         productRepository.save(product);
     }
+
+    @PreAuthorize("hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())")
+    public void lockProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> {throw new ProductNotFoundException("Không tìm thấy mặt hàng");});
+        product.setIsLocked(true);
+        productRepository.save(product);
+    }
+
+    @PreAuthorize("hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())")
+    public void unlockProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> {throw new ProductNotFoundException("Không tìm thấy mặt hàng");});
+        product.setIsLocked(false);
+        productRepository.save(product);
+    }
 }

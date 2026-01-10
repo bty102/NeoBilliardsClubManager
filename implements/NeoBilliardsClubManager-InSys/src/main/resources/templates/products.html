@@ -55,6 +55,8 @@
                         <td th:text="*{description}"></td>
                         <td>
                             <a sec:authorize="hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())" th:href="@{'/products/update/' + *{id}}">Cập nhật</a>
+                            <a onclick="return confirm('Khóa mặt hàng này?')" sec:authorize="hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())" th:if="*{!isLocked}" th:href="@{'products/lock/' + *{id}}">Khóa</a>
+                            <a onclick="return confirm('Mở khóa mặt hàng này?')" sec:authorize="hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())" th:if="*{isLocked}" th:href="@{'products/unlock/' + *{id}}">Mở khóa</a>
                         </td>
                     </tr>
                 </tbody>

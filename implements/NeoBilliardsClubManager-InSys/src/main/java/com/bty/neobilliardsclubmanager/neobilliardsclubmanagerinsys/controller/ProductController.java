@@ -77,4 +77,16 @@ public class ProductController {
         productService.createProduct(request);
         return "redirect:/products";
     }
+
+    @GetMapping("products/lock/{id}")
+    public String lockProduct(@PathVariable(name = "id") Long id) {
+        productService.lockProduct(id);
+        return "redirect:/products";
+    }
+
+    @GetMapping("products/unlock/{id}")
+    public String unlockProduct(@PathVariable(name = "id") Long id) {
+        productService.unlockProduct(id);
+        return "redirect:/products";
+    }
 }
