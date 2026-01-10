@@ -19,6 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -206,5 +207,16 @@ public class BillController {
             throw new RuntimeException(e);
         }
         return "redirect:/bills";
+    }
+
+    @GetMapping("/bills/monthly-revenue-statistics-for-the-year")
+    public String monthlyRevenueStatisticsForTheYear(@RequestParam(name = "year", required = false) Integer year, Model model) {
+        if(year == null) {
+            year = LocalDate.now().getYear();
+        }
+        List<MonthlyRevenueStatisticsForTheYear> monthlyRevenueStatisticsForTheYearList = billService.getMonthlyRevenueForYear(year);
+        model.addAttribute("monthlyRevenueStatisticsForTheYearList", monthlyRevenueStatisticsForTheYearList);
+        model.addAttribute("year", year);
+        return "monthly-revenue-statistics-for-the-year";
     }
 }

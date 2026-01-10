@@ -2,6 +2,7 @@ package com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.service;
 
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.request.BillCreationRequest;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.response.BillResponse;
+import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.dto.response.MonthlyRevenueStatisticsForTheYear;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.entity.*;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.exception.*;
 import com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.mapper.BillMapper;
@@ -23,8 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -196,5 +196,28 @@ public class BillService {
         if(bill.getMember() != null) {
             memberService.updateMemberLevelForMember(bill.getMember().getId());
         }
+    }
+
+    public List<MonthlyRevenueStatisticsForTheYear> getMonthlyRevenueForYear(int year) {
+
+        List<MonthlyRevenueStatisticsForTheYear> dataFromDb =
+                billRepository.getMonthlyRevenue(year);
+
+        Map<Integer, Long> revenueMap = new HashMap<>();
+        for (MonthlyRevenueStatisticsForTheYear item : dataFromDb) {
+            revenueMap.put(item.getMonth(), item.getTotalRevenue());
+        }
+
+        List<MonthlyRevenueStatisticsForTheYear> result = new ArrayList<>();
+        for (int month = 1; month <= 12; month++) {
+            result.add(
+                    MonthlyRevenueStatisticsForTheYear.builder()
+                            .month(month)
+                            .totalRevenue(revenueMap.getOrDefault(month, 0L))
+                            .build()
+            );
+        }
+
+        return result;
     }
 }

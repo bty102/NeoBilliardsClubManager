@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Thống kê doanh thu</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div th:replace="fragments::header">
+
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-2">
+            <div th:replace="fragments::sidebar">
+
+            </div>
+        </div>
+        <div class="col-10">
+            <div class="row justify-content-between">
+                <div class="col-auto">
+                    <form th:action="@{/bills/monthly-revenue-statistics-for-the-year}" method="get">
+                        <div class="row">
+                            <div class="col-auto">
+                                <input class="form-control" type="number" name="year" placeholder="Nhập năm...">
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-primary" type="submit">Tìm</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <h2 th:text="'Doanh thu năm ' + ${year}"></h2>
+
+                <canvas id="monthlyRevenueChart" height="100"></canvas>
+
+                <script th:inline="javascript">
+
+                    const monthlyRevenue = [[${monthlyRevenueStatisticsForTheYearList}]];
+
+                    const labels = monthlyRevenue.map(item => 'Tháng ' + item.month);
+
+                    const data = monthlyRevenue.map(item => item.totalRevenue);
+
+                    const ctx = document.getElementById('monthlyRevenueChart');
+
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Doanh thu (VNĐ)',
+                                data: data,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return value.toLocaleString('vi-VN') + ' ₫';
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.raw.toLocaleString('vi-VN') + ' ₫';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
