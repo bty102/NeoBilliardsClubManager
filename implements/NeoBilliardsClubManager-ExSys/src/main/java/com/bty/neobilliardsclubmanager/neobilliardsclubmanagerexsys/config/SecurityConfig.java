@@ -1,4 +1,4 @@
-package com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.config;
+package com.bty.neobilliardsclubmanager.neobilliardsclubmanagerexsys.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,11 +19,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
 
         httpSecurity.authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers( HttpMethod.GET, "/billiard-table-image/**").permitAll()
+                        .requestMatchers( "/register").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .defaultSuccessUrl("/billiardTables")
+                        .defaultSuccessUrl("/bills/current")
                         .permitAll()
                 )
                 .logout(logout -> logout
