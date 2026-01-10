@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -64,6 +65,38 @@ public class MemberService {
                 break;
             }
         }
+        memberRepository.save(member);
+    }
+
+    public List<MemberResponse> getAllMembers() {
+        List<Member> members = memberRepository.findAll();
+        return members
+                .stream()
+                .map(member -> memberMapper.toMemberResponse(member))
+                .toList();
+    }
+
+    public List<MemberResponse> findMembersByFullNameContaining(String key) {
+        List<Member> members = memberRepository.findByFullNameContaining(key);
+        return members
+                .stream()
+                .map(member -> memberMapper.toMemberResponse(member))
+                .toList();
+    }
+
+    @PreAuthorize("hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())")
+    public void lockMember(Long id) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> {throw new MemberNotFoundException("Không tìm thấy hội viên");});
+        member.setIsLocked(true);
+        memberRepository.save(member);
+    }
+
+    @PreAuthorize("hasRole(T(com.bty.neobilliardsclubmanager.neobilliardsclubmanagerinsys.constant.Role).ADMIN.name())")
+    public void unlockMember(Long id) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> {throw new MemberNotFoundException("Không tìm thấy hội viên");});
+        member.setIsLocked(false);
         memberRepository.save(member);
     }
 }
